@@ -9,7 +9,8 @@ pub struct Player {
     fall_acceleration: f32,
 
     velocity: Vector3,
-    // pivot: TRef<'a, Spatial>, // FIXME: have no idea what lifetime and how to specify it... need to learn
+    // TODO: keep references for objects which are used?
+    // pivot: TRef<'a, Spatial>,
 }
 
 #[methods]

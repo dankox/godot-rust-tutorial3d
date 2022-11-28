@@ -3,8 +3,6 @@ use rand::*;
 use std::f64::consts::PI;
 use std::ops::Mul;
 
-// static RAND : TRef<RandomNumberGenerator> = RandomNumberGenerator::new();
-
 #[derive(NativeClass)]
 #[inherit(KinematicBody)]
 pub struct Mob {

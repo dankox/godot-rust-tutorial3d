@@ -7,8 +7,6 @@ use crate::utils;
 // use crate::player;
 // use std::f64::consts::PI;
 
-// static RAND : TRef<RandomNumberGenerator> = RandomNumberGenerator::new();
-
 #[derive(NativeClass)]
 #[inherit(Node)]
 pub struct Main {
@@ -25,12 +23,6 @@ impl Main {
             // velocity: Vector3::ZERO,
         }
     }
-
-    // #[method]
-    // fn _physics_process(&mut self, #[base] owner: &Node, _delta: f32) {
-    //     // move the player (last 4 args are defaults)
-    //     // owner.move_and_slide(self.velocity, Vector3::UP, false, 4, 0.785398, true);
-    // }
 
     #[method]
     fn on_mobtimer_timeout(&mut self, #[base] owner: &Node) {
@@ -58,32 +50,3 @@ impl Main {
 
     }
 }
-
-// fn longest<'a>(str1: &'a str, str2: &'a str) -> &'a str {
-//     let mut i:i32 = 1;
-//     let ref_i:&mut i32 = &mut i;
-//     *ref_i = 2;
-//     i = 3;
-//     if i == 3 {
-//         println!("3")
-//     }
-//     // let ss: str;
-//     let s: &str = "test";
-
-//     if str1.len() > str2.len() {
-//         str1
-//     } else {
-//         str2
-//     }
-// }
-
-// fn test_longest() {
-//     let string1 = String::from("long string is long");
-//     let result;
-//     {
-//         let string2 = String::from("xyz");
-//         result = longest(string1.as_str(), string2.as_str());
-//         println!("The longest string is {}", result);
-//     }
-//     // println!("The longest string is {}", result);
-// }

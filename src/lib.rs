@@ -1,5 +1,4 @@
 use gdnative::prelude::*;
-// use gdnative::api::RandomNumberGenerator;
 
 mod mob;
 mod player;
@@ -8,7 +7,6 @@ mod utils;
 
 // Function that registers all exposed classes to Godot
 fn init(handle: InitHandle) {
-    // let rand = RandomNumberGenerator::new();
     handle.add_class::<player::Player>();
     handle.add_class::<mob::Mob>();
     handle.add_class::<main_scene::Main>();
