@@ -1,4 +1,4 @@
-use gdnative::prelude::*;
+use gdnative::{api::CollisionObject, prelude::*};
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody)]
@@ -7,6 +7,10 @@ pub struct Player {
     speed: f32,
     #[property(default = 75.0)]
     fall_acceleration: f32,
+    #[property(default = 20.0)]
+    jump_impulse: f32,
+    #[property(default = 16.0)]
+    bounce_impulse: f32,
 
     velocity: Vector3,
     // TODO: keep references for objects which are used?
@@ -19,6 +23,8 @@ impl Player {
         Player {
             speed: 14.0,
             fall_acceleration: 75.0,
+            jump_impulse: 20.0,
+            bounce_impulse: 16.0,
             velocity: Vector3::ZERO,
         }
     }
@@ -54,6 +60,10 @@ impl Player {
         self.velocity.z = direction.z * self.speed;
         // gravitation velocity
         self.velocity.y -= self.fall_acceleration * delta;
+        // add jump to velocity
+        if owner.is_on_floor() && input.is_action_just_pressed("jump", false) {
+            self.velocity.y += self.jump_impulse
+        }
         // move the player (last 4 args are defaults)
         self.velocity = owner.move_and_slide(self.velocity, Vector3::UP, false, 4, 0.785398, true);
 
