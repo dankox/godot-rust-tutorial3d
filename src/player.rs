@@ -1,4 +1,6 @@
-use gdnative::{api::CollisionObject, prelude::*};
+use gdnative::prelude::*;
+
+use crate::mob;
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody)]
@@ -67,5 +69,28 @@ impl Player {
         // move the player (last 4 args are defaults)
         self.velocity = owner.move_and_slide(self.velocity, Vector3::UP, false, 4, 0.785398, true);
 
+        for idx in 0..owner.get_slide_count() {
+            let collision = owner.get_slide_collision(idx).unwrap();
+            let collider = unsafe { collision.assume_safe().collider().unwrap() };
+            let node = unsafe { collider.assume_safe().cast::<Node>().unwrap() };
+            if node.is_in_group("mob") {
+                let mob = unsafe {
+                    collider
+                        .assume_unique()
+                        .try_cast::<KinematicBody>()
+                        .unwrap()
+                        .cast_instance::<mob::Mob>()
+                        .unwrap()
+                };
+                // godot_print!("mob hit...");
+                if Vector3::UP.dot(unsafe { collision.assume_safe().normal() }) > 0.1 {
+                    // hit from above, squash it!
+                    mob.map_mut(|m, o| m.squash(&o))
+                        .ok()
+                        .unwrap_or_else(|| godot_print!("unable to get mob from player"));
+                    self.velocity.y = self.bounce_impulse
+                }
+            }
+        }
     }
 }

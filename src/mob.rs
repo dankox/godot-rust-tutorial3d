@@ -5,6 +5,7 @@ use std::ops::Mul;
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody)]
+#[register_with(Self::register_mob)]
 pub struct Mob {
     #[property(default = 10.0)]
     min_speed: f32,
@@ -16,6 +17,10 @@ pub struct Mob {
 
 #[methods]
 impl Mob {
+    fn register_mob(builder: &ClassBuilder<Self>) {
+        builder.signal("squashed").done()
+    }
+
     pub fn new(_owner: &KinematicBody) -> Self {
         Mob {
             min_speed: 10.0,
@@ -52,6 +57,11 @@ impl Mob {
 
     #[method]
     fn on_screen_exited(&mut self, #[base] owner: &KinematicBody) {
+        owner.queue_free()
+    }
+    #[method]
+    pub fn squash(&mut self, #[base] owner: &KinematicBody) {
+        owner.emit_signal("squashed", &[]);
         owner.queue_free()
     }
 }
