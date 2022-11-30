@@ -4,6 +4,7 @@ use crate::mob;
 
 #[derive(NativeClass)]
 #[inherit(KinematicBody)]
+#[register_with(Self::register_player)]
 pub struct Player {
     #[property(default = 14.0)]
     speed: f32,
@@ -21,6 +22,10 @@ pub struct Player {
 
 #[methods]
 impl Player {
+    fn register_player(builder: &ClassBuilder<Self>) {
+        builder.signal("hit").done()
+    }
+
     fn new(_owner: &KinematicBody) -> Self {
         Player {
             speed: 14.0,
@@ -92,5 +97,17 @@ impl Player {
                 }
             }
         }
+    }
+
+    #[method]
+    fn on_mobdetector_body_entered(&mut self, #[base] owner: &KinematicBody, _body: Ref<KinematicBody>) {
+        self.die(owner)
+    }
+
+    fn die(&mut self, owner: &KinematicBody) {
+        // godot_print!("i'm dead!");
+        owner.emit_signal("hit", &[]);
+        // owner.print_tree_pretty(); // nicely printed node tree :)
+        owner.queue_free();
     }
 }

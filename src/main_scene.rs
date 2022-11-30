@@ -44,9 +44,16 @@ impl Main {
         let mob_scene = unsafe { mob_scene.into_shared().assume_safe() };
         owner.add_child(mob_scene, false);
         let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
-        mob.map_mut(|m, node| m.initialize(&node, mob_spawn_location.translation(), player_position))
-            .ok()
-            .unwrap_or_else(|| godot_print!("unable to get mob"));
+        mob.map_mut(|m, node| {
+            m.initialize(&node, mob_spawn_location.translation(), player_position)
+        })
+        .ok()
+        .unwrap_or_else(|| godot_print!("unable to get mob"));
+    }
 
+    #[method]
+    fn on_player_hit(&mut self, #[base] owner: &Node) {
+        let timer = unsafe { owner.get_node_as::<Timer>("MobTimer").unwrap() };
+        timer.stop();
     }
 }
