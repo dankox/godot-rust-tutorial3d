@@ -34,10 +34,16 @@ impl Main {
 
         // handle player position even if it's not there (a.k.a. is dead!)
         let player_position: Vector3;
-        let player =unsafe { owner.get_node_as::<KinematicBody>("Player") };
+        let player = unsafe { owner.get_node_as::<KinematicBody>("Player") };
         match player {
             Some(p) => player_position = p.translation(),
-            None => player_position = Vector3 { x: rng.gen_range(-14.0..=14.0), y: 0.0, z: rng.gen_range(-14.0..=16.0) },
+            None => {
+                player_position = Vector3 {
+                    x: rng.gen_range(-14.0..=14.0),
+                    y: 0.0,
+                    z: rng.gen_range(-14.0..=16.0),
+                }
+            }
         }
 
         // add mob to scene and initialize it
@@ -45,7 +51,9 @@ impl Main {
         owner.add_child(mob_scene, false);
         let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
         mob.map_mut(|m, node| {
-            m.initialize(&node, mob_spawn_location.translation(), player_position)
+            m.initialize(&node, mob_spawn_location.translation(), player_position);
+            let sl = unsafe { owner.get_node_as::<Label>("UserInterface/ScoreLabel").unwrap() };
+            node.connect("squashed", sl, "on_mob_squashed", VariantArray::new_shared(), 0).unwrap();
         })
         .ok()
         .unwrap_or_else(|| godot_print!("unable to get mob"));
