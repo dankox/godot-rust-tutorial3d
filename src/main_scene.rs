@@ -10,6 +10,7 @@ use crate::utils;
 pub struct Main {
     #[property]
     mob_scene: Ref<PackedScene>,
+    retry: Option<Ref<ColorRect>>,
 }
 
 #[methods]
@@ -17,6 +18,36 @@ impl Main {
     fn new(_owner: &Node) -> Self {
         Main {
             mob_scene: PackedScene::new().into_shared(),
+            retry: None,
+        }
+    }
+
+    #[method]
+    fn _ready(&mut self, #[base] owner: &Node) {
+        unsafe {
+            self.retry = Some(
+                owner
+                    .get_node_as::<ColorRect>("UserInterface/Retry")
+                    .unwrap()
+                    .claim(),
+            );
+            self.retry.unwrap().assume_safe().hide();
+        }
+    }
+
+    #[method]
+    fn _unhandled_input(&self, #[base] owner: &Node, event: Ref<InputEvent>) {
+        unsafe {
+            if event.assume_safe().is_action_pressed("ui_accept", false, false)
+                && self.retry.unwrap().assume_safe().is_visible()
+            {
+                owner
+                    .get_tree()
+                    .unwrap()
+                    .assume_safe()
+                    .reload_current_scene()
+                    .unwrap_or_else(|e| godot_print!("failed to reload scene! {}", e))
+            }
         }
     }
 
@@ -52,8 +83,19 @@ impl Main {
         let mob = mob_scene.cast_instance::<mob::Mob>().unwrap();
         mob.map_mut(|m, node| {
             m.initialize(&node, mob_spawn_location.translation(), player_position);
-            let sl = unsafe { owner.get_node_as::<Label>("UserInterface/ScoreLabel").unwrap() };
-            node.connect("squashed", sl, "on_mob_squashed", VariantArray::new_shared(), 0).unwrap();
+            let sl = unsafe {
+                owner
+                    .get_node_as::<Label>("UserInterface/ScoreLabel")
+                    .unwrap()
+            };
+            node.connect(
+                "squashed",
+                sl,
+                "on_mob_squashed",
+                VariantArray::new_shared(),
+                0,
+            )
+            .unwrap();
         })
         .ok()
         .unwrap_or_else(|| godot_print!("unable to get mob"));
@@ -61,7 +103,10 @@ impl Main {
 
     #[method]
     fn on_player_hit(&mut self, #[base] owner: &Node) {
-        let timer = unsafe { owner.get_node_as::<Timer>("MobTimer").unwrap() };
-        timer.stop();
+        unsafe {
+            let timer = owner.get_node_as::<Timer>("MobTimer").unwrap();
+            timer.stop();
+            self.retry.unwrap().assume_safe().show();
+        };
     }
 }

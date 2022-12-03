@@ -14,7 +14,7 @@ impl Score {
     
     #[method]
     fn _ready(&mut self, #[base] _owner: &Label) {
-        godot_print!("score class loaded?");
+        // godot_print!("score class loaded?");
     }
 
     #[method]
