@@ -1,10 +1,13 @@
 [entry]
 
 OSX.64="res://libtutorial3d_gd_native.dylib"
+X11.64="res://libtutorial3d_gd_native.so"
+Windows.64="res://tutorial3d-gd-native.dll"
 
 [dependencies]
 
 OSX.64=[  ]
+X11.64=[  ]
 
 [general]
 
