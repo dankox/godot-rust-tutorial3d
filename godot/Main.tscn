@@ -117,9 +117,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -150.0
+margin_left = -107.0
 margin_top = -14.0
-margin_right = 150.0
+margin_right = 107.0
 margin_bottom = 14.0
 text = "Press Enter to retry"
 

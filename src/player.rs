@@ -1,4 +1,6 @@
-use gdnative::prelude::*;
+use std::f32::consts::PI;
+
+use gdnative::{api::AnimationPlayer, prelude::*};
 
 use crate::mob;
 
@@ -59,7 +61,20 @@ impl Player {
         if direction != Vector3::ZERO {
             direction = direction.normalized();
             let pivot = unsafe { owner.get_node_as::<Spatial>("Pivot").unwrap() };
-            pivot.look_at(owner.translation() + direction, Vector3::UP)
+            pivot.look_at(owner.translation() + direction, Vector3::UP);
+            let anim: TRef<AnimationPlayer> = unsafe {
+                owner
+                    .get_node_as::<AnimationPlayer>("AnimationPlayer")
+                    .unwrap()
+            };
+            anim.set_speed_scale(4.0);
+        } else {
+            let anim: TRef<AnimationPlayer> = unsafe {
+                owner
+                    .get_node_as::<AnimationPlayer>("AnimationPlayer")
+                    .unwrap()
+            };
+            anim.set_speed_scale(1.0);
         }
 
         // ground velocity
@@ -69,7 +84,7 @@ impl Player {
         self.velocity.y -= self.fall_acceleration * delta;
         // add jump to velocity
         if owner.is_on_floor() && input.is_action_just_pressed("jump", false) {
-            self.velocity.y += self.jump_impulse
+            self.velocity.y += self.jump_impulse;
         }
         // move the player (last 4 args are defaults)
         self.velocity = owner.move_and_slide(self.velocity, Vector3::UP, false, 4, 0.785398, true);
@@ -97,10 +112,20 @@ impl Player {
                 }
             }
         }
+        let pivot = unsafe { owner.get_node_as::<Spatial>("Pivot").unwrap() };
+        pivot.set_rotation(Vector3::new(
+            PI / 6.0 * self.velocity.y / self.jump_impulse,
+            pivot.rotation().y,
+            pivot.rotation().z,
+        ));
     }
 
     #[method]
-    fn on_mobdetector_body_entered(&mut self, #[base] owner: &KinematicBody, _body: Ref<KinematicBody>) {
+    fn on_mobdetector_body_entered(
+        &mut self,
+        #[base] owner: &KinematicBody,
+        _body: Ref<KinematicBody>,
+    ) {
         self.die(owner)
     }
 
