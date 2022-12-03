@@ -1,3 +1,4 @@
+use gdnative::api::AnimationPlayer;
 use gdnative::prelude::*;
 use rand::*;
 use std::f64::consts::PI;
@@ -47,6 +48,12 @@ impl Mob {
         let random_speed = rng.gen_range(self.min_speed..=self.max_speed);
         self.velocity = Vector3::FORWARD.mul(random_speed);
         self.velocity = self.velocity.rotated(Vector3::UP, owner.rotation().y);
+        let anim: TRef<AnimationPlayer> = unsafe {
+            owner
+                .get_node_as::<AnimationPlayer>("AnimationPlayer")
+                .unwrap()
+        };
+        anim.set_speed_scale(f64::from(random_speed/self.min_speed));
     }
 
     #[method]
